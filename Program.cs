@@ -7,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration.GetSection("CosmosDb");
 string? account = config["Account"];
-string? key = config["Key"];
 string? dbName = config["DatabaseName"];
 string? containerName = config["ContainerName"];
 
@@ -16,14 +15,16 @@ string? blobUrl = blobStorage["Url"];
 
 
 // Use Managed Identity if key is not provided
-CosmosClient cosmosClient = string.IsNullOrEmpty(key)
-    ? new CosmosClient(account, new DefaultAzureCredential())
-    : new CosmosClient(account, key);
+
+Console.Out.WriteLine($"account: {account}");
+CosmosClient cosmosClient = new CosmosClient(account, new DefaultAzureCredential());
+Console.Out.WriteLine($"cosmosClient: {cosmosClient}");
 
 builder.Services.AddSingleton(cosmosClient);
 builder.Services.AddSingleton(sp =>
 {
     var client = sp.GetRequiredService<CosmosClient>();
+    Console.Out.WriteLine($"dbName: {dbName}");
     return client.GetContainer(dbName, containerName);
 });
 
