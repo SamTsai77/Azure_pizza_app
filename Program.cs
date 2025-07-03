@@ -1,7 +1,6 @@
-using Microsoft.Azure.Cosmos;
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using CosmosWebApi.Models;
+using Microsoft.Azure.Cosmos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +11,6 @@ string? containerName = config["ContainerName"];
 
 var blobStorage = builder.Configuration.GetSection("BlobStorage");
 string? blobUrl = blobStorage["Url"];
-
 
 // Use Managed Identity if key is not provided
 
@@ -27,6 +25,7 @@ builder.Services.AddSingleton(sp =>
     Console.Out.WriteLine($"dbName: {dbName}");
     return client.GetContainer(dbName, containerName);
 });
+
 
 
 Console.Out.WriteLine($"BlobStorage URL: {blobUrl}");
@@ -48,12 +47,30 @@ builder.Services.AddSingleton(sp =>
     return client.GetBlobContainerClient("menu");
 });
 
+
+
+
+
+// Add services to the container.
+
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

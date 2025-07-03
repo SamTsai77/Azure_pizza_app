@@ -1,1 +1,5 @@
-# Azure_pizza_app -2
+# Showcased the use of Azure through a pizza order app.
+## Applied Technologies: CosmosDB, Blob, REST API
+
+
+![alt text](./images/swagger.png)
